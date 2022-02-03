@@ -5,7 +5,7 @@
 # 은닉층 50개, 100개
 
 import sys, os
-sys.path.append('/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDocs/6. python/220125_밑딥1') # 부모 디렉토리 파일을 가져올 수 있도록 설정
+sys.path.append('/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDocs/7. python/220201_deeplearning_from_scratch_1') # 부모 디렉토리 파일을 가져올 수 있도록 설정
 import numpy as np
 from dataset.mnist import load_mnist
 from common.functions import sigmoid, softmax
@@ -24,7 +24,7 @@ def get_data():
 def init_network():
   # with 함수 : 파일을 열면 닫아야하는 명령을 해야 하는데, with함수를 사용함으로써 열고 닫는것을 자동 처리 함
   # open() as ~ : 파일을 불러오는 함수
-  with open("/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDocs/6. python/220125_밑딥1/ch03/sample_weight.pkl", 'rb') as f:
+  with open("/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDocs/7. python/220201_deeplearning_from_scratch_1/ch03/sample_weight.pkl", 'rb') as f:
     network = pickle.load(f)
 
   return network
