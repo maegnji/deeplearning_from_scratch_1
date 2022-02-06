@@ -3,6 +3,7 @@ sys.path.append('/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDo
 from common.functions import *
 from common.gradient import numerical_gradient
 from layers import *
+from collections import OrderedDict
 
 class TwoLayerNet:
     def __init__(self, input_size, hidden_size, output_size, weight_init_std=0.01):
@@ -15,7 +16,7 @@ class TwoLayerNet:
         self.params['b2'] = np.zeros(output_size) # hidden_size과 동일한 형상에 0을 채움
 
         #계층 생성
-        self.layers = OrderedDict()
+        self.layers = OrderedDict() # 입력된 items들의 순서를 기억하는 dictionary클래스 (기본 Dict과 거의 비슷)
         self.layers['Affine1'] = Affine(self.params['W1'], self.params['b1'])
         self.layers['Relu1'] = Relu()
         self.layers['Affine2'] = Affine(self.params['W2'], self.params['b2'])
@@ -34,8 +35,11 @@ class TwoLayerNet:
 
         # return y
 
+        # 순전파때는 dict에 추가한 순서대로 각 계층의 forward()만 호출하기만 하면 됨! (역전파는 그 반대)
         for layer in self.layers.values():
             x = layer.forward(x)
+        
+        return x
 
 
     # 손실함수
@@ -43,7 +47,8 @@ class TwoLayerNet:
     def loss(self, x, t):
         y = self.predict(x)
 
-        return cross_entropy_error(y, t)
+        return self.lastLayer.forward(y,t)
+        # return cross_entropy_error(y, t)
 
     # 정확도 측정
     def accuracy(self, x, t):
@@ -65,3 +70,26 @@ class TwoLayerNet:
         grads['b2'] = numerical_gradient(loss_W, self.params['b2'])
 
         return grads
+
+    def gradient(self, x, t):
+        # 순전파
+        self.loss(x,t)
+
+        # 역전파
+        dout = 1
+        dout = self.lastLayer.backward(dout)
+
+        layers = list(self.layers.values())
+        layers.reverse()
+        for layer in layers:
+            dout = layer.backward(dout)
+
+        # 결과 저장
+        grads = {}
+        grads['W1'] = self.layers['Affine1'].dW
+        grads['b1'] = self.layers['Affine1'].db
+        grads['W2'] = self.layers['Affine2'].dW
+        grads['b2'] = self.layers['Affine2'].db
+
+        return grads
+

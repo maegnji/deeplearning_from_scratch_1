@@ -22,14 +22,6 @@ class simpleNet:
 net = simpleNet()
 print(net.W)
 
-# W는 더미
-# 아래 표현으로 대체할 수 있음
-# f = lamdba w: net.loss(x,t)
-def f(W):
-    return net.loss(x,t)
-
-
-
 x = np.array([0.6, 0.9])
 p = net.predict(x)
 print(p)
@@ -37,8 +29,4 @@ print(p)
 print(np.argmax(p))
 
 t = np.array([0,0,1])
-print(net.loss(x, t))
-
-# 손실함수의 기울기 (2*3)
-dW = numerical_gradient(f, net.W)
-print(dW)
+print(net.loss(x, t))   
