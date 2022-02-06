@@ -27,7 +27,7 @@ class Sigmoid:
         self.out = None
 
     def forward(self, x):
-        out = 1 / (1 + np.exp(-x))
+        out = sigmoid(x)
         self.out = out
 
         return out
@@ -48,7 +48,7 @@ class Affine:
 
     def forward(self, x):
         self.x = x
-        out = np.dot(x, self.W) + self.b
+        out = np.dot(self.x, self.W) + self.b
 
         return out
 
@@ -75,6 +75,11 @@ class SoftmaxWithLoss:
 
     def backward(self, dout=1):
         batch_size = self.t.shape[0]
-        dx = (self.y - self.t) / batch_size # 역전파일때는 전파하는 값을 배치 수로 나눔
+        if self.t.size == self.y.size: # 정답 레이블이 원-핫 인코딩 형태일 때
+            dx = (self.y - self.t) / batch_size
+        else:
+            dx = self.y.copy()
+            dx[np.arange(batch_size), self.t] -= 1
+            dx = dx / batch_size
 
         return dx

@@ -1,9 +1,10 @@
 import sys, os
 sys.path.append('/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDocs/7. python/220201_deeplearning_from_scratch_1') # 부모 디렉토리 파일을 가져올 수 있도록 설정
-from common.functions import *
 from common.gradient import numerical_gradient
-from layers import *
+from common.layers import *
 from collections import OrderedDict
+from dataset.mnist import load_mnist
+
 
 class TwoLayerNet:
     def __init__(self, input_size, hidden_size, output_size, weight_init_std=0.01):
@@ -54,7 +55,8 @@ class TwoLayerNet:
     def accuracy(self, x, t):
         y = self.predict(x)
         y = np.argmax(y, axis=1)
-        t = np.argmax(t, axis=1)
+        if t.ndim != 1:
+            t = np.argmax(t, axis=1)
 
         accuracy = np.sum(y == t) / float(x.shape[0])
         return accuracy
