@@ -11,7 +11,7 @@ import sys, os
 sys.path.append('/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDocs/7. python/220201_deeplearning_from_scratch_1') # 부모 디렉토리 파일을 가져올 수 있도록 설정
 import numpy as np
 from dataset.mnist import load_mnist
-from two_layer_net_softmax_copy import TwoLayerNet
+from two_layer_net_softmax import TwoLayerNet
 
 # 데이터 읽기
 (x_train, t_train), (x_test, t_test) = load_mnist(normalize=True, one_hot_label=True)
