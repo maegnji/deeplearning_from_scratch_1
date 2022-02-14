@@ -52,9 +52,13 @@ v : 속도. 기울기 방향으로 힘을 받아 물체가 가속되는 것을 �
 
 class Momentum:
     def __init__(self, lr=0.01, momentum=0.9):
+        # mommentum은 0.9로 세팅 (물체가 아무런 힘을 받지 않을때, 서서히 하강시키는 역할)
+        # lr은 학습률
+        # grads는 손실함수의 기울기
+        # v는 물체의 속도 (초기화때는 아무것도 담지 않음)
         self.lr = lr
         self.momentum = momentum
-        self.v = None # v는 물체의 속도 (초기화때는 아무것도 담지 않음)
+        self.v = None 
 
     def update(self, params, grads):
         # update()가 처음 호출될 때 매개변수와 같은 구조의 데이터를 dict로 저장
@@ -66,3 +70,60 @@ class Momentum:
         for key in params.keys():
             self.v[key] = self.momentum * self.v[key] - self.lr * grads[key]
             params[key] += self.v[key]
+
+
+# 6.1.5 AdaGrad
+"""
+학습률이 너무 작으면 학습 시간이 길어지고 너무 크면 발산한다.다
+학습률을 정하는 효과적인 기술로 학습률 감소learning rate decay가 있다.
+학습을 진행하면서 학습률을 점차 줄여나간다.
+AdaGrad 방식은 각각의 매개변수에 맞춰 적응적으로 학습률을 조정하며 학습을 진행한다.
+h ← h + ∂L/∂W ⊙ ∂L/∂W
+W ← W - η *1/√h * ∂L/∂W
+⊙ : 행렬의 원소별 곱셈
+h는 기존 기울기를 제곱해서 누적하며, 매개변수 갱신에 1/√h를 곱해준다.
+매개변수가 크게 갠신된 원소는 학습률이 낮아진다.
+NOTE : AdaGrad는 과거의 기울기를 제곱하여 계속 더하기 때문에 학습을 진행할 수록
+갱신 강도가 약해진다. 이 문제를 개선한 기법으로 RMSProp이 있다.
+RMSProp에서는 먼 과거의 기울기는 서서히 잊고 새로운 기울기 정보를 크게 반영한다.
+이를 지수이동평균Exponential Moving Average이라 하며 과거 기울기의 반영 규모를
+기하급수적으로 감소시킨다.
+"""
+
+class AdaGrad:
+    def __init__(self, lr=0.01):
+        self.lr = lr
+        self.h = None
+    
+    def update(self, params, grads):
+        if self.h is None:
+            self.h = {}
+            for key, val in params.items():
+                self.h[key] = np.zeros_like(val)
+
+        for key in params.keys():
+            self.h[key] += grads[key] * grads[key]
+            params[key] -= self.lr * grads[key] / (np.sqrt(self.h[key]) + 1e-7)
+
+
+# 6.1.6 Adam
+"""
+모멘텀과 AdaGrad의 두 기법을 융합한 기법. 2015년에 제안되었음.
+또 하이퍼파라미터의 '편향 보정'이 진행됨
+RMSprop과 Adam은 common/optizizer.py에서 구현해둠
+"""
+
+
+# 6.1.7 어느 갱신 방법을 이용할 것인가?
+"""
+각 방법의 그래프는 optimizer_compare_naive.py를 참고
+모든 문제에서 항상 뛰어난 기법은 없다. 하이퍼파라미터를 어떻게 설정하느냐에 따라서도
+결과가 달라진다.
+"""
+
+# 6.1.8 MNIST 데이터셋으로 본 갱신 방법 비교
+"""
+숫자 인식을 대상으로 네 기법을 비교한 그래프는 optimizer_compare_mnist.py 참고
+각 층이 100개의 뉴런으로 구성된 5층 신경망에서 ReLU를 활성화 함수로 사용
+인식률은 AdaGrad > Adam > Momentum >> SGD 순서였음
+"""
