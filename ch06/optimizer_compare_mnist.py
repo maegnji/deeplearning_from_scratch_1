@@ -3,8 +3,8 @@ import os
 import sys
 import matplotlib.pyplot as plt
 import numpy as np
-from dataset.mnist import load_mnist
 sys.path.append('/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDocs/7. python/220201_deeplearning_from_scratch_1') # 부모 디렉토리 파일을 가져올 수 있도록 설정
+from dataset.mnist import load_mnist
 from common.util import smooth_curve
 from common.multi_layer_net import MultiLayerNet
 from common.optimizer import *
