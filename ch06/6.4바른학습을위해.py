@@ -74,3 +74,44 @@ class Dropout:
 
     def backward(self, dout):
         return dout * self.mask
+
+"""
+overfit_dropout.py 참고
+훈련과 시험 데이터에 대한 정확도 차이가 줄어듬
+훈련 데이터에 대한 정확도가 100%에 도달하지 않음.
+epoch:301, train acc:0.73, test acc:0.6315
+NOTE : 앙상블 학습ensemble learning : 개별적으로 학습시킨 여러 모델의 출력을 평균내 추론.
+앙상블 학습을 사용하면 신경망의 정확도가 몇% 정도 개선된다는 것이 실험적으로 알려져 있음.
+앙상블 학습은 드롭아웃과 밀접하다. 학습 때 뉴런을 무작위로 학습하는 것이 매번 다른 모델을
+학습시키는 것으로 해석할 수 있다. 추론 때 삭제한 비율을 곱하는 것은 앙상블에서 모델의 평균과 같다.
+"""
+
+# 6.5 적절한 하이퍼파라미터 값 찾기
+# 6.5.1 검증 데이터
+"""
+데이터셋을 훈련 데이터와 시험 데이터로 분리해 이용해서 오버피팅과 범용 성능 등을 평가했다.
+하이퍼파라미터를 설정하고 검증할 때는 시험 데이터를 사용해서는 안 된다.
+시험 데이터를 사용하여 하이퍼파라미터를 조정하면 하이퍼파라미터 값이 시험 데이터에 오버피팅된다.
+따라서 하이퍼파라미터를 조정할때는 전용 확인 데이터가 필요하다.
+이를 검증 데이터validation data라고 부른다.
+NOTE :
+ * 훈련 데이터 : 매개변수(가중치와 편향)의 학습에 이용
+ * 검증 데이터 : 하이퍼파라미터의 성능을 평가
+ * 시험 데이터 : 범용 성능을 확인하기 위해 마지막에(이상적으로는 한 번만) 이용
+MNIST는 검증 데이터가 따로 없다. 훈련 데이터에서 20% 정도를 분리해서 사용할 수 있다.
+"""
+
+(x_train, t_train), (x_test, t_test) = load_mnist()
+
+# 훈련 데이터를 뒤섞는다.
+# shuffle_dataset은 commom/util.py에 있는데, np.random.shuffle을 활용함
+x_train, t_train = shuffle_dataset(x_train, t_train)
+
+# 20%를 검증 데이터로 분할
+validation_rate = 0.20
+validation_num = int(x_train.shape[0] * validation_rate)
+x_val = x_train[:validation_num]
+t_val = t_train[:validation_num]
+x_train = x_train[validation_num:]
+t_train = t_train[validation_num:]
+
