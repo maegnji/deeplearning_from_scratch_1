@@ -2,6 +2,8 @@ import sys, os
 import numpy as np
 sys.path.append('/Users/maengseongjin/Library/Mobile Documents/com~apple~CloudDocs/7. python/220201_deeplearning_from_scratch_1') # 부모 디렉토리 파일을 가져올 수 있도록 설정
 from common.functions import *
+from common.util import im2col, col2im
+
 
 
 class Relu:
@@ -42,12 +44,19 @@ class Affine:
     def __init__(self, W, b):
         self.W = W
         self.b = b
+        
         self.x = None
+        self.original_x_shape = None
+        # 가중치와 편향 매개변수의 미분
         self.dW = None
         self.db = None
 
     def forward(self, x):
+        # 텐서 대응
+        self.original_x_shape = x.shape
+        x = x.reshape(x.shape[0], -1)
         self.x = x
+
         out = np.dot(self.x, self.W) + self.b
 
         return out
@@ -55,10 +64,12 @@ class Affine:
     def backward(self, dout):
         dx = np.dot(dout, self.W.T)
         self.dW = np.dot(self.x.T, dout)
-        self.db = np.sum(dout, axis = 0)
-
+        self.db = np.sum(dout, axis=0)
+        
+        dx = dx.reshape(*self.original_x_shape)  # 입력 데이터 모양 변경(텐서 대응)
         return dx
 
+        
 # softmax-with-loss 구현
 # 신경망의 출력과 정답 레이블의 오차를 앞계층에 그대로 전달!
 class SoftmaxWithLoss:
